@@ -90,7 +90,8 @@ class ZipFS(FS):
              'atomic.setcontents': False
              }
 
-    def __init__(self, zip_file, mode="r", compression="deflated", allow_zip_64=False, encoding="CP437", thread_synchronize=True):
+    def __init__(self, zip_file, mode="r", compression="deflated", allow_zip_64=False, encoding="CP437", thread_synchronize=True,
+                 tempfs_kwargs=None):
         """Create a FS that maps on to a zip file.
 
         :param zip_file: a (system) path, or a file-like object
@@ -116,6 +117,7 @@ class ZipFS(FS):
 
         self.zip_mode = mode
         self.encoding = encoding
+        tempfs_kwargs = tempfs_kwargs or {}
 
         if isinstance(zip_file, basestring):
             zip_file = os.path.expanduser(os.path.expandvars(zip_file))
@@ -139,7 +141,7 @@ class ZipFS(FS):
         self.zip_path = str(zip_file)
         self.temp_fs = None
         if mode in 'wa':
-            self.temp_fs = tempfs.TempFS()
+            self.temp_fs = tempfs.TempFS(**tempfs_kwargs)
 
         self._path_fs = MemoryFS()
         if mode in 'ra':
